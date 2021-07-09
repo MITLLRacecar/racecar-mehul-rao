@@ -6,6 +6,8 @@ Summer 2020
 Lab 2A - Color Image Line Following
 """
 
+# TODO QUEUE UP A TURN WITH A DOUBLE CROP
+
 ########################################################################################
 # Imports
 ########################################################################################
@@ -29,10 +31,11 @@ rc = racecar_core.create_racecar()
 MIN_CONTOUR_AREA = 30
 
 # A crop window for the floor directly in front of the car
-CROP_FLOOR = ((360, 0), (rc.camera.get_height(), rc.camera.get_width()))
+SECOND_CROP_FLOOR = ((200, 0), (350, rc.camera.get_width()))
+CROP_FLOOR = ((350, 0), (rc.camera.get_height(), rc.camera.get_width()))
 
 # Colors, stored as a pair (hsv_min, hsv_max)
-BLUE = ((90, 50, 50), (120, 255, 255))  # The HSV range for the color blue
+BLUE = ((90, 120, 120), (120, 255, 255))  # The HSV range for the color blue
 # TODO (challenge 1): add HSV ranges for other colors
 GREEN = ((60, 50, 50), (80, 255, 255))
 RED = ((0, 50, 50), (0, 255, 255)) # original value was (0, 100, 100)
@@ -116,6 +119,7 @@ def start():
     """
     global speed
     global angle
+    rc.drive.set_max_speed(1)
 
     # Initialize variables
     speed = 0
