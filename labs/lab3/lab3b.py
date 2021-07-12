@@ -229,8 +229,7 @@ def update():
 
     # Crops the depth image
     top_left_inclusive = (0, 0)
-    bottom_right_exclusive = ((rc.camera.get_height() // 3) * 2, rc.camera.get_width())
-    cropped_image = crop(blurred_image, top_left_inclusive, bottom_right_exclusive)
+    bottom_right_exclusive = ((rc.camera.get_height() // 10) * 9, rc.camera.get_width())
 
 
 	# Using the color camera to mask the depth camera
@@ -238,11 +237,12 @@ def update():
     mask = get_mask(image, ORANGE[0], ORANGE[1])
     masked_depth_image = cv.bitwise_and(depth_image, depth_image, mask=mask)
     masked_depth_image = (masked_depth_image - 0.01) % 10000
-    rc.display.show_depth_image(masked_depth_image)
 
     # Gets the distance to the closest value in the new masked depth image
-    x, y = get_closest_pixel(masked_depth_image)
-    distance = masked_depth_image[y, x]
+    cropped_image = crop(masked_depth_image, top_left_inclusive, bottom_right_exclusive)
+    rc.display.show_depth_image(cropped_image)
+    x, y = get_closest_pixel(cropped_image)
+    distance = cropped_image[y, x]
     print(distance)
 
     # Checks if car overshot parking and backs up
