@@ -95,10 +95,8 @@ def get_mask(
     hsv_lower = np.array(hsv_lower)
     hsv_upper = np.array(hsv_upper)
 
-    # TODO: Use the cv.cvtColor function to switch our BGR colors to HSV colors
     image = cv.cvtColor(image, cv.COLOR_BGR2HSV)
 
-    # TODO: Use the cv.inRange function to highlight areas in the correct range
     mask = cv.inRange(image, hsv_lower, hsv_upper)
 
     return mask
@@ -118,7 +116,6 @@ def update():
     After start() is run, this function is run every frame until the back button
     is pressed
     """
-    # TODO: Park the car 30 cm away from the closest orange cone.
     global speed
     global angle
     global isParked
@@ -126,7 +123,6 @@ def update():
     # Search for contours in the current color image
     update_contour()
 
-    # TODO: Park the car 30 cm away from the closest orange cone
     # Tries to turn at the angle corresponding to the contour center
     # If no contour center, then turn at an angle of 0.3
     try:
