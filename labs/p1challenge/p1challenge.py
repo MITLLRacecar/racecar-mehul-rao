@@ -26,11 +26,12 @@ class Mode(Enum):
     searching = 0
     red = 1
     blue = 2
-    driving = 3
+    linear = 3
 
 class Color(Enum):
     RED = 0
     BLUE = 1
+    BOTH = 2
 
 curr_mode = Mode.searching
 color_priority = Color.RED
@@ -78,8 +79,15 @@ def update_contours(color_image):
         # Draw a dot at the center of this contour in red
         if contour_R is not None and contour_B is not None: # checks if both are valid
 
+            contour_area_R = rc_utils.get_contour_area(contour_R)
+            contour_area_B = rc_utils.get_contour_area(contour_B)
+            # if the contour areas are similar enough, indicate that it is a checkpoint
+            if abs(contour_area_R - contour_area_B) < 700:
+                print(abs(contour_area_R - contour_area_B))
+                return None, Color.BOTH
+
             # If red contour is bigger than the blue one
-            if rc_utils.get_contour_area(contour_R) > rc_utils.get_contour_area(contour_B):
+            elif contour_area_R > contour_area_B:
                 return contour_R, Color.RED
 
             # If blue contour is equal to or bigger than the red one
@@ -136,6 +144,7 @@ def update():
     speed = 0.0
     angle = 0.0
     distance = 5000
+    speed_multiplier = 1
 
     rc.drive.set_max_speed(0.75)
     # TODO: Slalom between red and blue cones.  The car should pass to the right of
@@ -182,25 +191,30 @@ def update():
         curr_mode = Mode.red
     elif color == Color.BLUE:
         curr_mode = Mode.blue
+    elif color == Color.BOTH:
+        curr_mode = Mode.linear
     else:
         curr_mode = Mode.searching
 
     # Check current mode and implement the respective actions
     if distance < 40:
+        print("0 angle")
         angle = 0
-    if curr_mode == Mode.red and distance < 150:
+    if curr_mode == Mode.red and (distance < 150 or distance > 400):
         # TODO: Red Cone Logic -> drive right to avoid
-        angle = rc_utils.remap_range(contour_center[1], -20, camera_width + 20, 0, 1)
-        angle *= rc_utils.remap_range(distance, 500, 30, 0, 2)
+        angle = rc_utils.remap_range(contour_center[1] + 50, -20, camera_width + 20, 0, 1)
+        angle *= rc_utils.remap_range(distance, 200, 30, 0, 2)
         print("RED, ANGLE:", angle)
         color_priority = Color.RED
-    elif curr_mode == Mode.blue and distance < 150:
+    elif curr_mode == Mode.blue and (distance < 150 or distance > 400):
         # TODO: Blue Cone Logic -> drive left to avoid
-        angle = rc_utils.remap_range(contour_center[1], -20, camera_width + 20, -1, 0)
-        angle *= rc_utils.remap_range(distance, 30, 500, 2, 0)
+        angle = rc_utils.remap_range(contour_center[1] - 50, -20, camera_width + 20, -1, 0)
+        angle *= rc_utils.remap_range(distance, 30, 200, 2, 0)
         print("BLUE, ANGLE:", angle)
         color_priority = Color.BLUE
     elif (curr_mode == Mode.blue or curr_mode == Mode.red) and distance > 150 and distance < 400:
+        angle = 0
+    elif curr_mode == Mode.linear:
         angle = 0
     else:
         if color_priority == Color.RED:
@@ -219,6 +233,8 @@ def update():
     # Clamping functions
     angle = rc_utils.clamp(angle, -1, 1)
     speed = rc_utils.remap_range(abs(angle), 0, 1, 1, 0.1)
+    speed_multiplier = rc_utils.remap_range(last_distance, 40, 150, 0.01, 1)
+    speed *= speed_multiplier
     speed = rc_utils.clamp(speed, -1, 1)
 
 
