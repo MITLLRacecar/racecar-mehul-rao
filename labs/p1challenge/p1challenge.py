@@ -37,6 +37,9 @@ color_priority = Color.RED
 
 speed = 0.0
 angle = 0.0
+last_distance = 0
+
+# counter = 0
 
 rc = racecar_core.create_racecar()
 
@@ -52,7 +55,7 @@ def update_contours(color_image):
     Finds contoours for the blue and red cone using color image
     """
 
-    MIN_CONTOUR_AREA = 100
+    MIN_CONTOUR_AREA = 550
 
     # If no image is fetched
     if color_image is None:
@@ -126,11 +129,15 @@ def update():
     global speed
     global angle
     global color_priority
+    global last_distance
+    # global counter
 
     # Reset speed and angle variables
     speed = 0.0
     angle = 0.0
+    distance = 5000
 
+    rc.drive.set_max_speed(0.75)
     # TODO: Slalom between red and blue cones.  The car should pass to the right of
     # each red cone and the left of each blue cone.
 
@@ -139,10 +146,10 @@ def update():
     color_image = rc.camera.get_color_image()
 
     # Get camera sizes
-    camera_height = (rc.camera.get_height() // 10) * 9
-    camera_width = (rc.camera.get_width() // 10) * 9
+    camera_height = (rc.camera.get_height() // 10) * 10
+    camera_width = (rc.camera.get_width() // 10) * 10
 
-    top_left_inclusive = (0, 0)
+    top_left_inclusive = (0, rc.camera.get_width() - camera_width)
     bottom_right_exclusive = ((camera_height, camera_width))
 
     # Cropping both images
@@ -164,9 +171,11 @@ def update():
 
         # Calculate distance
         distance = rc_utils.get_pixel_average_distance(depth_image, contour_center)
+        last_distance = distance
+        print(f"Distance: {distance}")
 
     else:
-        curr_mode = Mode.driving
+        curr_mode = Mode.searching
 
     # Setting the current state
     if color == Color.RED:
@@ -177,35 +186,40 @@ def update():
         curr_mode = Mode.searching
 
     # Check current mode and implement the respective actions
-    if curr_mode == Mode.red and distance < 200:
-        # TODO: Red Cone Logic -> drive right
-        # angle = rc_utils.remap_range(contour_center[1], 0, camera_width, 0, 1)
-        angle = rc_utils.remap_range(distance, 500, 60, 0, 0.5)
+    if distance < 40:
+        angle = 0
+    if curr_mode == Mode.red and distance < 150:
+        # TODO: Red Cone Logic -> drive right to avoid
+        angle = rc_utils.remap_range(contour_center[1], -20, camera_width + 20, 0, 1)
+        angle *= rc_utils.remap_range(distance, 500, 30, 0, 2)
         print("RED, ANGLE:", angle)
         color_priority = Color.RED
-    elif curr_mode == Mode.blue and distance < 200:
-        # TODO: Blue Cone Logic -> drive left
-        # angle = rc_utils.remap_range(contour_center[1], 0, camera_width, -1, 0)
-        angle = rc_utils.remap_range(distance, 60, 500, -0.5, 0)
+    elif curr_mode == Mode.blue and distance < 150:
+        # TODO: Blue Cone Logic -> drive left to avoid
+        angle = rc_utils.remap_range(contour_center[1], -20, camera_width + 20, -1, 0)
+        angle *= rc_utils.remap_range(distance, 30, 500, 2, 0)
         print("BLUE, ANGLE:", angle)
         color_priority = Color.BLUE
+    elif (curr_mode == Mode.blue or curr_mode == Mode.red) and distance > 150 and distance < 400:
+        angle = 0
     else:
         if color_priority == Color.RED:
-            angle = -1
+            angle = rc_utils.remap_range(last_distance, 0, 100, -0.2, -0.5) # drive left to return
         else:
-            angle = 1
+            angle = rc_utils.remap_range(last_distance, 0, 100, 0.2, 0.5) # drive right to return
 
 
     ###########
     # TEMP MANUAL CONTROLS
     ###########
-    speed -= rc.controller.get_trigger(rc.controller.Trigger.LEFT)
-    speed += rc.controller.get_trigger(rc.controller.Trigger.RIGHT)
+    #speed -= rc.controller.get_trigger(rc.controller.Trigger.LEFT)
+    #speed += rc.controller.get_trigger(rc.controller.Trigger.RIGHT)
 
 
     # Clamping functions
-    speed = rc_utils.clamp(speed, -1, 1)
     angle = rc_utils.clamp(angle, -1, 1)
+    speed = rc_utils.remap_range(abs(angle), 0, 1, 1, 0.1)
+    speed = rc_utils.clamp(speed, -1, 1)
 
 
     # Displaying the color camera that was drawn on
