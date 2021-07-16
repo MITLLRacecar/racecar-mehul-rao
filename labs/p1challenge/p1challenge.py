@@ -56,7 +56,7 @@ def update_contours(color_image):
     Finds contoours for the blue and red cone using color image
     """
 
-    MIN_CONTOUR_AREA = 550
+    MIN_CONTOUR_AREA = 800
 
     # If no image is fetched
     if color_image is None:
@@ -200,22 +200,27 @@ def update():
     if distance < 40:
         print("0 angle")
         angle = 0
-    if curr_mode == Mode.red and (distance < 150 or distance > 400):
+    if curr_mode == Mode.red and (distance < 170):
         # TODO: Red Cone Logic -> drive right to avoid
-        angle = rc_utils.remap_range(contour_center[1] + 50, -20, camera_width + 20, 0, 1)
+        angle = rc_utils.remap_range(contour_center[1], 0, camera_width, 0.2, 1)
         angle *= rc_utils.remap_range(distance, 200, 30, 0, 2)
         print("RED, ANGLE:", angle)
         color_priority = Color.RED
-    elif curr_mode == Mode.blue and (distance < 150 or distance > 400):
+    elif curr_mode == Mode.blue and (distance < 170):
         # TODO: Blue Cone Logic -> drive left to avoid
-        angle = rc_utils.remap_range(contour_center[1] - 50, -20, camera_width + 20, -1, 0)
+        angle = rc_utils.remap_range(contour_center[1], 0, camera_width, -1, -0.2)
         angle *= rc_utils.remap_range(distance, 30, 200, 2, 0)
         print("BLUE, ANGLE:", angle)
         color_priority = Color.BLUE
-    elif (curr_mode == Mode.blue or curr_mode == Mode.red) and distance > 150 and distance < 400:
-        angle = 0
+    elif (curr_mode == Mode.blue or curr_mode == Mode.red) and distance > 170:
+        if curr_mode == Mode.blue:
+            angle = rc_utils.remap_range(contour_center[1], 0, camera_width, -0.4, 0.05)
+        elif curr_mode == Mode.red:
+            angle = rc_utils.remap_range(contour_center[1], 0, camera_width, -0.05, 0.4)
+        print("waiting")
     elif curr_mode == Mode.linear:
-        angle = 0
+        print("got here")
+        angle = -1
     else:
         if color_priority == Color.RED:
             angle = rc_utils.remap_range(last_distance, 0, 100, -0.2, -0.5) # drive left to return
