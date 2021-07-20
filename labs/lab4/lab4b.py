@@ -41,7 +41,7 @@ def start():
     """
     # Have the car begin at a stop
     rc.drive.stop()
-    rc.drive.set_max_speed(0.25)
+    rc.drive.set_max_speed(0.5)
     # Print start message
     print(">> Lab 4B - LIDAR Wall Following")
 
@@ -61,7 +61,7 @@ def update():
     right_dist = rc_utils.get_lidar_average_distance(scan, RIGHT_WINDOW, 10)
     left_dist = rc_utils.get_lidar_average_distance(scan, LEFT_WINDOW, 10)
     _, forward_dist = rc_utils.get_lidar_closest_point(scan, FRONT_WINDOW)
-    speed = rc_utils.remap_range(forward_dist, 60, 130, 0.1, 1)
+    speed = rc_utils.remap_range(forward_dist, 60, 130, 0, 1)
     #if forward_dist < 45:
     #    speed = -1
 
@@ -69,9 +69,9 @@ def update():
 
     angle = rc_utils.remap_range(right_dist - left_dist, -70, 70, -1, 1)
     angle = rc_utils.clamp(angle, -1, 1)
-    speed = rc_utils.clamp(speed, -1, 1)
+    speed = rc_utils.clamp(speed, 0, 1)
     #angle = 0
-    speed = 1
+    #speed = 1
     rc.drive.set_speed_angle(speed, angle)
     rc.display.show_lidar(scan)
     pass

@@ -76,7 +76,7 @@ def update():
     if not (rc.controller.is_down(rc.controller.Button.LB) or rc.controller.is_down(rc.controller.Button.RB)):
         if forward_dist < 70:
             speed = -1
-        if back_dist < 80:
+        if back_dist < 70:
             speed = 1
 
     # Use the left joystick to control the angle of the front wheels
