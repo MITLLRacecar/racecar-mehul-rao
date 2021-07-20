@@ -73,6 +73,11 @@ def update():
 
     # TODO (warmup): Prevent the car from hitting things in front or behind it.
     # Allow the user to override safety stop by holding the left or right bumper.
+    if not (rc.controller.is_down(rc.controller.Button.LB) or rc.controller.is_down(rc.controller.Button.RB)):
+        if forward_dist < 70:
+            speed = -1
+        if back_dist < 80:
+            speed = 1
 
     # Use the left joystick to control the angle of the front wheels
     angle = rc.controller.get_joystick(rc.controller.Joystick.LEFT)[0]
