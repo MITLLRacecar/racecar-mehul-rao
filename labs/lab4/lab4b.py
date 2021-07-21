@@ -41,7 +41,7 @@ def start():
     """
     # Have the car begin at a stop
     rc.drive.stop()
-    rc.drive.set_max_speed(0.45)
+    rc.drive.set_max_speed(0.25)
     # Print start message
     print(">> Lab 4B - LIDAR Wall Following")
 
