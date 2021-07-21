@@ -136,15 +136,15 @@ def update():
     #speed = rc_utils.remap_range(forward_dist, 60, 130, 0, 1)
     if curr_mode == Mode.wall_following:
         angle = rc_utils.remap_range(right_dist - left_dist, -70, 70, -1, 1)
-        if forward_dist < 60:
+        if forward_dist < 65:
             if turn_priority == "Left":
                 angle = -1
-                speed = rc_utils.remap_range(forward_dist, 40, 80, 0.3, 1)
+                speed = 0.5
                 #speed = 1
                 print("LEFT")
             elif turn_priority == "Right":
                 angle = 1
-                speed = rc_utils.remap_range(forward_dist, 40, 80, 0.3, 1)
+                speed = 0.5
                 #speed = 1
                 print("RIGHT")
         print(left_dist, right_dist, right_dist - left_dist)
@@ -165,6 +165,7 @@ def update():
     # TODO: Turn left if we see a marker with ID 0 and right for ID 1
     if markers is not None:
         for i in markers:
+            print(i)
             i.detect_colors(color_image, potential_colors)
             if i.get_id() == 0:
                 turn_priority = "Left"
