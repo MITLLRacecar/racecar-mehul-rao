@@ -74,7 +74,6 @@ def update():
     speed = 1
     rc.drive.set_speed_angle(speed, angle)
     rc.display.show_lidar(scan)
-    pass
 
 
 ########################################################################################

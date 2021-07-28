@@ -45,7 +45,7 @@ speed = 0.0  # The current speed of the car
 angle = 0.0  # The current angle of the car's wheels
 contour_center = None  # The (pixel row, pixel column) of contour
 contour_area = 0  # The area of contour
-color_list = [RED, GREEN, BLUE]
+color_list = [GREEN, RED, BLUE]
 
 ########################################################################################
 # Functions
@@ -108,9 +108,6 @@ def update_contour():
             else:
                 contour_center = None
                 contour_area = 0
-
-        # Display the image to the screen
-        rc.display.show_color_image(image)
 
 
 def start():
@@ -210,28 +207,6 @@ def update():
             print("No contour found")
         else:
             print("Center:", contour_center, "Area:", contour_area)
-
-'''
-def update_slow():
-    """
-    After start() is run, this function is run at a constant rate that is slower
-    than update().  By default, update_slow() is run once per second
-    """
-    # Print a line of ascii text denoting the contour area and x-position
-    if rc.camera.get_color_image() is None:
-        # If n"""o image is found, print all X's and don't display an image
-        print("X" * 10 + " (No image) " + "X" * 10)
-    else:
-        # If an image is found but no contour is found, print all dashes
-        if contour_center is None:
-            print("-" * 32 + " : area = " + str(contour_area))
-
-        # Otherwise, print a line of dashes with a | indicating the contour x-position
-        else:
-            s = ["-"] * 32
-            s[int(contour_center[1] / 20)] = "|"
-            print("".join(s) + " : area = " + str(contour_area))
-'''
 
 ########################################################################################
 # DO NOT MODIFY: Register start and update and begin execution
