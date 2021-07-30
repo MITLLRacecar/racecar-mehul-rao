@@ -510,7 +510,7 @@ def update():
             # print("color:", color, "arColor", arTagColor)
             if arTagColor == color:
                 # print("speed")
-                speed = 0.9
+                speed = 0.6
             else:
                 # print("slow")
                 speed = 0.2
