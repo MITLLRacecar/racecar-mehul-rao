@@ -481,7 +481,7 @@ def update():
                 rc.drive.set_max_speed(0.5)
                 speed = 0.7
                 angle = 0
-                willTransfer = True
+                willTransferLedge = True
             # print("setting last angle:", last_angle)
             #angle = last_angle
         else:
@@ -898,7 +898,7 @@ def update():
         angle = 0
         if counter > 0.1:
             counter = 0
-            willTransfer = False
+            willTransferLedge = False
         else:
             counter += rc.get_delta_time()
             
