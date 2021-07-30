@@ -416,7 +416,7 @@ def update():
             elif i.get_id() == 6 and depth < 100:
                 willTransfer = False
                 cur_state = State.line_following #orange_planks
-                rc.drive.set_max_speed(0.6)
+                rc.drive.set_max_speed(0.5)
                 rampDetect = True
             elif i.get_id() == 8 and depth < 100:
                 willTransferJump = False
@@ -437,7 +437,7 @@ def update():
             if rampDetect:
                 if further_distance - distance < 5:
                     # print("ramp detected")
-                    speed = -1
+                    speed = 0.1
                 else:
                     speed = rc_utils.remap_range(abs(angle), 0, 1, 1, 0.5)
             else:
