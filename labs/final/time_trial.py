@@ -47,7 +47,7 @@ def update():
     After start() is run, this function is run every frame until the back button
     is pressed
     """
-    pass
+    rc_utils.set_speed_angle(0,0)
 
 
 ########################################################################################
